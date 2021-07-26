@@ -4,9 +4,8 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 from decouple import config
-from flask import Flask, redirect, url_for, render_template, Response
+from flask import Flask, redirect, url_for, render_template
 from flask_dance.contrib.google import make_google_blueprint, google
-import cv2
 
 app = Flask(__name__)
 
@@ -19,20 +18,6 @@ app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = config('CLIENT_SECRET')
 # setting up the google blueprint & registring it
 blueprint = make_google_blueprint(reprompt_consent=True, scope=['profile', 'email'])
 app.register_blueprint(blueprint, url_prefix='/login')
-camera = cv2.VideoCapture(0)
-
-def gen_frames():  # generate frame by frame from camera
-    while True:
-        # Capture frame-by-frame
-        success, frame = camera.read()  # read the camera frame
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
-
 
 
 @app.route('/')
@@ -56,11 +41,6 @@ def static_feed():
     else:
         return redirect(url_for('index'))
 
-@app.route('/video_feed')
-def video_feed():
-    #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
 
 @app.route('/live_feed')
 def live_feed():
@@ -71,8 +51,6 @@ def live_feed():
         return render_template('live_feed.html', name=name)
     else:
         return redirect(url_for('index'))
-
-
 
 @app.route('/login/google')
 def login():
