@@ -4,7 +4,7 @@
 </p>
 
 A web application that uses flask to create a stream of the user web cam, as well as including a static video while implementing Google's OAuth for credentials.
-The website is <a href="https://newappv.herokuapp.com">here</a>.
+The website is <a href="https://stream-app-fiu.herokuapp.com/">here</a>.
 
 I used for this project the following:
 <ul>
